@@ -1,0 +1,75 @@
+🔹 Option 1 — Recommended (ISO Install)
+
+This is the official way.
+
+Download the ISO
+From Security Onion Download
+.
+Example: SecurityOnion-2.4.180.iso (version may change).
+
+Create boot media / VM
+
+If physical: burn ISO to USB.
+
+If VM: attach ISO as CD/DVD and boot.
+
+Boot & Install
+
+At boot menu: choose Install Security Onion.
+
+Go through installer (similar to Ubuntu Server): set hostname, disk, user.
+
+Initial Setup (so-setup)
+After reboot, run:
+
+sudo so-setup
+
+
+Choose Standalone (lab) or Distributed (production).
+
+Pick the interface for packet capture.
+
+Set the admin password.
+
+Access Web Interface
+Open browser → https://<server-ip>
+Login with admin / password you set.
+From here you’ll see SOC UI, Kibana, Hunt, TheHive, etc.
+
+🔹 Option 2 — Advanced (on top of Ubuntu 24.04)
+
+This is not recommended for beginners, but possible if you want to layer it on an existing Ubuntu.
+
+Update System
+
+sudo apt update && sudo apt upgrade -y
+
+
+Add Security Onion Repo
+
+curl -s https://securityonionsolutions.com/keys/securityonion.gpg | sudo apt-key add -
+echo "deb [arch=amd64] https://repo.securityonion.net/ focal main" | sudo tee /etc/apt/sources.list.d/securityonion.list
+sudo apt update
+
+
+Install Security Onion Packages
+
+sudo apt install securityonion -y
+
+
+Run Setup
+
+sudo so-setup
+
+
+⚠️ But keep in mind: Security Onion devs strongly recommend using the ISO installer, because it ensures kernel, Suricata, Zeek, and dependencies are correctly tuned.
+
+✅ Minimum Requirements (Standalone)
+
+8 CPU cores
+
+16 GB RAM
+
+200 GB SSD
+
+2 NICs (1 for management, 1 for sniffing — optional in lab)

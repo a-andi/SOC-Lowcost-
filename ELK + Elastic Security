@@ -1,0 +1,119 @@
+Got it 👍. You want to install ELK Stack (Elasticsearch, Logstash, Kibana) with Elastic Security (SIEM) on Ubuntu 24.04.
+
+Here’s a clean step-by-step guide:
+
+1. Update System
+sudo apt update && sudo apt upgrade -y
+
+2. Install Dependencies
+sudo apt install apt-transport-https software-properties-common wget curl gnupg -y
+
+3. Add Elasticsearch GPG Key & Repo
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+
+
+Update:
+
+sudo apt update
+
+4. Install Elasticsearch
+sudo apt install elasticsearch -y
+
+
+Enable & start:
+
+sudo systemctl enable elasticsearch
+sudo systemctl start elasticsearch
+
+
+Check status:
+
+systemctl status elasticsearch
+
+
+⚠️ First run will auto-generate a password and enrollment token.
+Find it with:
+
+sudo cat /etc/elasticsearch/elasticsearch.yml | grep "bootstrap" -A 20
+sudo cat /usr/share/elasticsearch/config/elasticsearch.keystore
+
+
+Or check logs:
+
+sudo journalctl -u elasticsearch | grep "password"
+
+5. Install Kibana
+sudo apt install kibana -y
+
+
+Enable & start:
+
+sudo systemctl enable kibana
+sudo systemctl start kibana
+
+6. Configure Kibana (Elastic Security UI)
+
+Edit:
+
+sudo nano /etc/kibana/kibana.yml
+
+
+Add:
+
+server.host: "0.0.0.0"
+elasticsearch.hosts: ["https://localhost:9200"]
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "<your_password>"
+
+
+Restart:
+
+sudo systemctl restart kibana
+
+
+Access in browser:
+
+http://<your_server_ip>:5601
+
+7. Install Logstash (optional if you need parsing)
+sudo apt install logstash -y
+
+
+Enable & start:
+
+sudo systemctl enable logstash
+sudo systemctl start logstash
+
+8. Enable Elastic Security (SIEM)
+
+Once Kibana is running:
+
+Login at http://<ip>:5601 with elastic user & password.
+
+Go to Security → Getting Started.
+
+Enable SIEM detection rules.
+
+Add agents (Elastic Agent with Endpoint Security) for log collection.
+
+Install Elastic Agent on endpoint:
+
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.x-linux-x86_64.tar.gz
+tar xzvf elastic-agent-8.x-linux-x86_64.tar.gz
+cd elastic-agent-8.x-linux-x86_64
+sudo ./elastic-agent install
+
+
+Enroll it using token from Kibana → Fleet → Agents → Add agent.
+
+✅ At this point you’ll have:
+
+Elasticsearch (data storage)
+
+Kibana (visualization + Security UI)
+
+Logstash (optional pipeline)
+
+Elastic Security (SIEM/EDR)
